@@ -604,3 +604,366 @@ body, html {
     font-size: 12px;
 }
 
+
+
+/* ==========================================================================
+   PrismVista AI Copilot & Chatbot Styles
+   ========================================================================== */
+
+/* Floating Chat Toggle Button */
+.prism-chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    height: 44px;
+    padding: 0 18px;
+    background: linear-gradient(135deg, #7928ca, #0070f3);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(121, 40, 202, 0.45), 0 0 15px rgba(0, 112, 243, 0.35);
+    z-index: 1000;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.prism-chat-toggle:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 25px rgba(121, 40, 202, 0.6), 0 0 20px rgba(0, 223, 216, 0.5);
+}
+
+.prism-chat-toggle.active {
+    background: linear-gradient(135deg, #5b1fa0, #0050b3);
+}
+
+.chat-icon {
+    font-size: 16px;
+    animation: pulseGlow 2.5s infinite;
+}
+
+.chat-status-dot {
+    width: 8px;
+    height: 8px;
+    background: #00dfd8;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #00dfd8;
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.15); filter: brightness(1.3); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* Chatbox Window Container */
+.prism-chat-box {
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    width: 380px;
+    height: 540px;
+    background: rgba(22, 25, 34, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(121, 40, 202, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 1001;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.96);
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), pointer-events 0.25s;
+}
+
+.prism-chat-box.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+}
+
+/* Chat Header */
+.chat-header {
+    height: 56px;
+    background: rgba(30, 34, 46, 0.9);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+.chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-header-badge {
+    background: linear-gradient(135deg, #7928ca, #00dfd8);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+
+.chat-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.chat-header-subtitle {
+    font-size: 10.5px;
+    color: var(--accent-cyan);
+}
+
+.chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chat-header-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.chat-header-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+/* Quick Pills */
+.chat-quick-pills {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(18, 20, 28, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+}
+
+.chat-quick-pills::-webkit-scrollbar {
+    display: none;
+}
+
+.quick-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.quick-pill:hover {
+    background: rgba(121, 40, 202, 0.25);
+    border-color: #7928ca;
+    color: #ffffff;
+}
+
+/* Chat Message Body */
+.chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-message {
+    max-width: 88%;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    border-radius: 10px;
+    word-break: break-word;
+}
+
+.chat-message.user-msg {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #7928ca, #0070f3);
+    color: #ffffff;
+    border-bottom-right-radius: 2px;
+    box-shadow: 0 2px 10px rgba(121, 40, 202, 0.3);
+}
+
+.chat-message.bot-msg {
+    align-self: flex-start;
+    background: rgba(35, 40, 52, 0.85);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom-left-radius: 2px;
+}
+
+.chat-message code {
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--accent-cyan);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+}
+
+.action-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.action-badge {
+    display: inline-block;
+    background: rgba(0, 223, 216, 0.12);
+    border: 1px solid rgba(0, 223, 216, 0.35);
+    color: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Chat Input Footer */
+.chat-footer {
+    height: 52px;
+    background: rgba(26, 30, 42, 0.95);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+}
+
+.chat-footer input {
+    flex: 1;
+    background: rgba(18, 20, 28, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.chat-footer input:focus {
+    border-color: #7928ca;
+    box-shadow: 0 0 8px rgba(121, 40, 202, 0.3);
+}
+
+.chat-send-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7928ca, #0070f3);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.chat-send-btn:hover {
+    transform: scale(1.08);
+}
+
+/* Settings Drawer */
+.chat-settings-drawer {
+    display: none;
+    background: rgba(28, 32, 44, 0.98);
+    border-bottom: 1px solid var(--border-color);
+    padding: 14px;
+    font-size: 12px;
+}
+
+.chat-settings-drawer.show {
+    display: block;
+}
+
+.settings-title {
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.settings-desc {
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+.settings-field {
+    margin-bottom: 10px;
+}
+
+.settings-field label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.chat-select, .chat-input-text {
+    width: 100%;
+    background: rgba(18, 20, 28, 0.8);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    outline: none;
+}
+
+.settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.chat-btn-primary {
+    background: #7928ca;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.chat-btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
