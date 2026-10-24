@@ -610,31 +610,28 @@ body, html {
    PrismVista AI Copilot & Chatbot Styles
    ========================================================================== */
 
-/* Floating Chat Toggle Button */
+/* Top-Right Chat Toggle Button */
 .prism-chat-toggle {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    height: 44px;
-    padding: 0 18px;
+    height: 32px;
+    padding: 0 14px;
     background: linear-gradient(135deg, #7928ca, #0070f3);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 22px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
+    gap: 6px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(121, 40, 202, 0.45), 0 0 15px rgba(0, 112, 243, 0.35);
+    box-shadow: 0 2px 12px rgba(121, 40, 202, 0.45), 0 0 10px rgba(0, 112, 243, 0.3);
     z-index: 1000;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
 }
 
 .prism-chat-toggle:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 25px rgba(121, 40, 202, 0.6), 0 0 20px rgba(0, 223, 216, 0.5);
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 4px 18px rgba(121, 40, 202, 0.6), 0 0 14px rgba(0, 223, 216, 0.5);
 }
 
 .prism-chat-toggle.active {
@@ -642,13 +639,13 @@ body, html {
 }
 
 .chat-icon {
-    font-size: 16px;
+    font-size: 14px;
     animation: pulseGlow 2.5s infinite;
 }
 
 .chat-status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     background: #00dfd8;
     border-radius: 50%;
     box-shadow: 0 0 8px #00dfd8;
@@ -660,13 +657,14 @@ body, html {
     100% { transform: scale(1); filter: brightness(1); }
 }
 
-/* Chatbox Window Container */
+/* Chatbox Window Container (Top-Right Dropdown) */
 .prism-chat-box {
     position: fixed;
-    bottom: 80px;
-    right: 24px;
+    top: 56px;
+    right: 16px;
     width: 380px;
     height: 540px;
+    max-height: calc(100vh - 72px);
     background: rgba(22, 25, 34, 0.95);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -679,7 +677,7 @@ body, html {
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px) scale(0.96);
+    transform: translateY(-12px) scale(0.96);
     transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), pointer-events 0.25s;
 }
 

@@ -18,7 +18,7 @@ class PrismChatbot {
     }
 
     initUI() {
-        // Floating Toggle Button
+        // Top-Right Toggle Button
         const toggleBtn = document.createElement('button');
         toggleBtn.id = 'prismChatToggleBtn';
         toggleBtn.className = 'prism-chat-toggle';
@@ -27,7 +27,12 @@ class PrismChatbot {
             <span class="chat-label">AI 어시스턴트</span>
             <span class="chat-status-dot"></span>
         `;
-        document.body.appendChild(toggleBtn);
+        const rightActions = document.querySelector('.right-actions');
+        if (rightActions) {
+            rightActions.appendChild(toggleBtn);
+        } else {
+            document.body.appendChild(toggleBtn);
+        }
 
         // Chat Container Modal
         const chatContainer = document.createElement('div');
@@ -483,3 +488,4 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }, 50);
 });
+
