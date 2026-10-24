@@ -1,0 +1,15 @@
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Visual Studio / Roslyn temporary files
+*.obj
+*.pdb
+*.user
+*.suo
+.vs/
+
+# Temp
+output/screenshot*

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrismVista 3D - Real-time Ray Tracing 3D Renderer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="appRoot">
+        <!-- Top Header Navigation -->
+        <header id="topHeader">
+            <div class="brand-section">
+                <span class="logo-badge">PV</span>
+                <span class="app-title">PRISMVISTA 3D</span>
+                <span class="engine-status">● PrismVista RTX Engine</span>
+            </div>
+
+            <div class="center-tools">
+                <button class="tool-btn active" data-tool="select" title="객체 선택">🎯 Select</button>
+                <button class="tool-btn" data-tool="move" title="이동">↔ Move</button>
+                <button class="tool-btn" data-tool="rotate" title="회전">🔄 Rotate</button>
+                <button class="tool-btn" data-tool="scale" title="크기">⤢ Scale</button>
+
+                <div class="dropdown-container">
+                    <button class="tool-btn" id="addMeshBtn">➕ 3D 추가 ▼</button>
+                    <div class="dropdown-menu" id="addMenuDropdown">
+                        <div class="dropdown-item" data-type="box">📦 큐브 (Box)</div>
+                        <div class="dropdown-item" data-type="sphere">⚪ 구 (Sphere)</div>
+                        <div class="dropdown-item" data-type="cylinder">🏛️ 원기둥 (Cylinder)</div>
+                        <div class="dropdown-item" data-type="plane">⬛ 바닥 슬래브 (Floor)</div>
+                    </div>
+                </div>
+
+                <button class="tool-btn" id="importModelBtn">📂 3D 파일 불러오기 (.obj)</button>
+                <input type="file" id="modelFileInput" accept=".obj" style="display: none;">
+
+                <button class="tool-btn" id="turntableBtn">🔄 360° 턴테이블</button>
+            </div>
+
+            <div class="right-actions">
+                <button class="btn-render-primary" id="renderImageBtn">📷 고화질 렌더링</button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main id="mainWorkspace">
+            <!-- Left Panel: Scene & Assets -->
+            <aside class="panel" id="leftPanel">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="scene">씬 계층구조</button>
+                    <button class="tab-btn" data-tab="views">카메라 뷰</button>
+                </div>
+                <div class="panel-content">
+                    <!-- Scene Hierarchy Tab -->
+                    <div class="tab-content active" data-tab="scene">
+                        <div class="control-title" style="margin-bottom: 10px;">Scene Objects</div>
+                        <div class="scene-list" id="sceneHierarchyList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Camera Views Tab -->
+                    <div class="tab-content" data-tab="views">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span class="control-title" style="margin: 0;">Saved Views</span>
+                            <button id="addCameraViewBtn" class="action-icon-btn" style="font-size: 11px; padding: 3px 8px; border: 1px solid var(--border-color); border-radius: 4px;">➕ 현재 뷰 저장</button>
+                        </div>
+                        <div class="views-grid" id="cameraViewsList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Viewport -->
+            <section id="viewportContainer">
+                <canvas id="renderCanvas"></canvas>
+
+                <div class="viewport-overlay-info">
+                    <span id="fpsCounter">60 FPS</span>
+                    <span>|</span>
+                    <span>PBR Viewport</span>
+                    <span>|</span>
+                    <span>DirectX 12 / DXR Modeled</span>
+                </div>
+
+                <div class="viewport-nav-hint">
+                    🖱️ 좌클릭: 뷰 회전 | 우클릭: 화면 이동 | 휠: 줌 | WASD/QE: 건축 워크스루 | F: 포커스
+                </div>
+            </section>
+
+            <!-- Right Panel: Inspector -->
+            <aside class="panel" id="rightPanel">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="env">환경/조명</button>
+                    <button class="tab-btn" data-tab="mat">재질(PBR)</button>
+                    <button class="tab-btn" data-tab="camera">카메라/후보정</button>
+                    <button class="tab-btn" data-tab="transform">좌표</button>
+                </div>
+
+                <div class="panel-content">
+                    <!-- Environment Tab -->
+                    <div class="tab-content active" data-tab="env">
+                        <div class="control-group">
+                            <div class="control-title">태양 & 하늘 프리셋</div>
+                            <div class="preset-buttons-row">
+                                <button class="preset-btn active" data-preset="midday">☀️ 한낮 맑음</button>
+                                <button class="preset-btn" data-preset="sunset">🌅 일몰 골든아워</button>
+                                <button class="preset-btn" data-preset="overcast">☁️ 흐린 하늘</button>
+                                <button class="preset-btn" data-preset="night">🌙 나이트 스튜디오</button>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-title">태양광 (Sun Position)</div>
+                            <div class="slider-row">
+                                <span class="slider-label">고도 (Altitude)</span>
+                                <input type="range" class="slider-input" id="sunAltSlider" min="1" max="89" value="45">
+                                <span class="slider-val" id="sunAltVal">45</span>°
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">방위각 (Azimuth)</span>
+                                <input type="range" class="slider-input" id="sunAzimuthSlider" min="0" max="360" value="135">
+                                <span class="slider-val" id="sunAzimuthVal">135</span>°
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">태양 밝기</span>
+                                <input type="range" class="slider-input" id="sunIntensitySlider" min="0.1" max="4.0" step="0.1" value="1.6">
+                                <span class="slider-val" id="sunIntensityVal">1.6</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-title">대기 & 안개 (Fog)</div>
+                            <div class="slider-row">
+                                <span class="slider-label">원경 안개 농도</span>
+                                <input type="range" class="slider-input" id="fogDensitySlider" min="0.000" max="0.02" step="0.001" value="0.003">
+                                <span class="slider-val" id="fogDensityVal">0.003</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Material Tab -->
+                    <div class="tab-content" data-tab="mat">
+                        <div id="noSelectionNotice" style="color: var(--text-muted); text-align: center; padding: 24px 0;">
+                            뷰포트에서 3D 객체를 클릭하여<br>재질을 편집하세요.
+                        </div>
+
+                        <div id="inspectorBody" style="display: none;">
+                            <div class="control-group">
+                                <div class="control-title">선택된 객체</div>
+                                <input type="text" id="selectedObjName" class="select-custom" readonly style="margin-bottom: 12px; font-weight: 600;">
+                            </div>
+
+                            <div class="control-group">
+                                <div class="control-title">물리 기반 재질 (PBR)</div>
+                                <div class="color-row">
+                                    <span class="slider-label">기본 색상 (Albedo)</span>
+                                    <input type="color" class="color-input" id="matColorPicker" value="#cccccc">
+                                </div>
+                                <div class="slider-row">
+                                    <span class="slider-label">거칠기 (Roughness)</span>
+                                    <input type="range" class="slider-input" id="matRoughnessSlider" min="0" max="1" step="0.02" value="0.35">
+                                    <span class="slider-val" id="matRoughnessVal">0.35</span>
+                                </div>
+                                <div class="slider-row">
+                                    <span class="slider-label">금속성 (Metallic)</span>
+                                    <input type="range" class="slider-input" id="matMetallicSlider" min="0" max="1" step="0.02" value="0.10">
+                                    <span class="slider-val" id="matMetallicVal">0.10</span>
+                                </div>
+                                <div class="slider-row">
+                                    <span class="slider-label">투명도 (Opacity)</span>
+                                    <input type="range" class="slider-input" id="matOpacitySlider" min="0.05" max="1" step="0.05" value="1.0">
+                                    <span class="slider-val" id="matOpacityVal">1.00</span>
+                                </div>
+                                <div class="slider-row" style="margin-top: 10px;">
+                                    <span class="slider-label">와이어프레임 보기</span>
+                                    <input type="checkbox" id="matWireframeChk">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera & Post-Processing Tab -->
+                    <div class="tab-content" data-tab="camera">
+                        <div class="control-group">
+                            <div class="control-title">카메라 광학 설정</div>
+                            <div class="slider-row">
+                                <span class="slider-label">화각 (FOV)</span>
+                                <input type="range" class="slider-input" id="cameraFovSlider" min="30" max="95" value="55">
+                                <span class="slider-val" id="cameraFovVal">55</span>°
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-title">시네마틱 톤매핑 & 색보정</div>
+                            <div class="slider-row">
+                                <span class="slider-label">노출값 (Exposure)</span>
+                                <input type="range" class="slider-input" id="exposureSlider" min="0.4" max="2.5" step="0.05" value="1.1">
+                                <span class="slider-val" id="exposureVal">1.10</span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">블룸 (Bloom Glow)</span>
+                                <input type="range" class="slider-input" id="bloomSlider" min="0" max="1.5" step="0.05" value="0.35">
+                                <span class="slider-val" id="bloomVal">0.35</span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">대비 (Contrast)</span>
+                                <input type="range" class="slider-input" id="contrastSlider" min="0.7" max="1.4" step="0.02" value="1.05">
+                                <span class="slider-val" id="contrastVal">1.05</span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">채도 (Saturation)</span>
+                                <input type="range" class="slider-input" id="saturationSlider" min="0.0" max="2.0" step="0.05" value="1.05">
+                                <span class="slider-val" id="saturationVal">1.05</span>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <span class="slider-label">톤매핑 알고리즘</span>
+                                <select id="toneMappingSelect" class="select-custom">
+                                    <option value="aces" selected>ACES Filmic (영화/건축 표준)</option>
+                                    <option value="reinhard">Reinhard (소프트 하이라이트)</option>
+                                    <option value="linear">Linear (원시 색상)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transform Tab -->
+                    <div class="tab-content" data-tab="transform">
+                        <div class="control-group">
+                            <div class="control-title">위치 (Position)</div>
+                            <div class="coord-grid">
+                                <div class="coord-box"><span class="coord-tag">X</span><input type="number" step="0.1" id="posX" class="coord-val"></div>
+                                <div class="coord-box"><span class="coord-tag">Y</span><input type="number" step="0.1" id="posY" class="coord-val"></div>
+                                <div class="coord-box"><span class="coord-tag">Z</span><input type="number" step="0.1" id="posZ" class="coord-val"></div>
+                            </div>
+
+                            <div class="control-title">회전 (Rotation °)</div>
+                            <div class="coord-grid">
+                                <div class="coord-box"><span class="coord-tag">X</span><input type="number" step="5" id="rotX" class="coord-val"></div>
+                                <div class="coord-box"><span class="coord-tag">Y</span><input type="number" step="5" id="rotY" class="coord-val"></div>
+                                <div class="coord-box"><span class="coord-tag">Z</span><input type="number" step="5" id="rotZ" class="coord-val"></div>
+                            </div>
+
+                            <div class="control-title">크기 (Scale)</div>
+                            <div class="coord-grid">
+                                <div class="coord-box"><span class="coord-tag">X</span><input type="number" step="0.1" id="scaleX" class="coord-val"></div>
+                                <div class="coord-box"><span class="coord-tag">Y</span><input type="number" step="0.1" id="scaleY" class="coord-val"></div>
+                                <div class="coord-box"><span class="coord-tag">Z</span><input type="number" step="0.1" id="scaleZ" class="coord-val"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- High-Res Render Export Modal -->
+        <div class="modal-overlay" id="renderModal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <span class="modal-title">고화질 렌더링 내보내기 (Export Image)</span>
+                    <button class="modal-close-btn" id="closeRenderModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: var(--text-secondary); margin-bottom: 14px; font-size: 12px;">
+                        현재 뷰포트의 실시간 레이 트레이싱 광원 및 PBR 재질을 지정한 해상도로 렌더링하여 이미지 파일로 저장합니다.
+                    </p>
+                    <label style="font-weight: 600; font-size: 12px; display: block; margin-bottom: 4px;">출력 해상도</label>
+                    <select id="renderResolution" class="select-custom" style="margin-bottom: 16px;">
+                        <option value="fhd" selected>Full HD (1920 x 1080) - 일반 웹 / 프레젠테이션</option>
+                        <option value="2k">2K QHD (2560 x 1440) - 고해상도 모니터</option>
+                        <option value="4k">4K UHD (3840 x 2160) - 고품질 인쇄 / 건축 패널</option>
+                    </select>
+
+                    <label style="font-weight: 600; font-size: 12px; display: block; margin-bottom: 4px;">포맷</label>
+                    <div style="font-size: 12px; color: var(--text-secondary); background: var(--bg-tertiary); padding: 8px 12px; border-radius: 4px;">
+                        PNG 24-bit Lossless Image (Alpha Support)
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="document.getElementById('renderModal').classList.remove('show')">취소</button>
+                    <button class="btn-render-primary" id="executeRenderBtn">렌더링 및 저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (Pure Offline, No External Dependencies) -->
+    <script src="js/math3d.js"></script>
+    <script src="js/engine3d.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
